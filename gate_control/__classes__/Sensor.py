@@ -7,4 +7,4 @@ class Sense:
         GPIO.setup(self.gpio, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     def get_state(self):
-        return GPIO.input(self.gpio['IN'])
+        return GPIO.input(self.gpio)
