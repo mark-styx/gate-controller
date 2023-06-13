@@ -66,7 +66,7 @@ class Gate:
             if (active) and (dt.now().timestamp() - t >= DOOR_TRAVEL_TIME):
                 self.RELAYS[tgt].open()
                 active = 0
-            sleep(self.SENSORS[['PING']])
+            sleep(self.SENSORS['PING'])
 
 
 if __name__ == '__main__':
