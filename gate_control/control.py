@@ -61,7 +61,7 @@ class Gate:
                 self.__BT_SENSE_STATE__()
                 and dt.now().timestamp() - t >= 1
                 ):
-                tgt,t = self.time_activate()
+                tgt,t = self.activate()
                 active = 1
             if (active) and (dt.now().timestamp() - t >= DOOR_TRAVEL_TIME):
                 self.RELAYS[tgt].open()
