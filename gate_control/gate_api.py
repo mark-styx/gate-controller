@@ -5,12 +5,12 @@ HelmsDeep = Gate()
 
 app = Flask(__name__)
 @app.route('/gate/open', methods=['post'])
-def gate_trigger():
+def gate_open():
    HelmsDeep.api_activate('UP')
    return 'opened'
 
 @app.route('/gate/close', methods=['post'])
-def gate_trigger():
+def gate_close():
    HelmsDeep.api_activate('DN')
    return 'closed'
 
