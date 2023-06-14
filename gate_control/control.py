@@ -21,6 +21,10 @@ class Gate:
         self.__sensor_meta = SENSORS
         self.__initialize_assets__()
 
+    def all_off(self):
+        for relay in self.RELAYS:
+            relay.open()
+
 
     def __initialize_assets__(self):
         self.RELAYS = {x:Relay(gpio=y) for x,y in self.__relay_meta['GPIO'].items()}
