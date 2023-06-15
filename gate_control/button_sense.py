@@ -11,7 +11,9 @@ Button = Sense(gpio=SENSORS['GPIO']['BT'],id='momentary switch')
 tchk = lambda: dt.now().timestamp()
 
 def send_gate_signal(self,mock):
-    resp = requests.post(f'{HOST}/gate/activate',data={'mock':mock})
+    resp = requests.post(f'{HOST}/gate/activate'
+                         , headers={'content-type':'application/json'}
+                         , data={'mock':mock})
     print(resp.status_code,resp.content)
     return resp
 
@@ -22,7 +24,7 @@ def button_control_flow(mock=False):
     '''
     t = dt.now().timestamp()
     while True:
-        if Button.get_state() and t - tchk() >= 1:
+        if not(Button.get_state()) and t - tchk() >= 1:
             send_gate_signal(mock)
             t = tchk()
         sleep(SENSORS['PING'])
