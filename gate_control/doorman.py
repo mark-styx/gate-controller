@@ -1,5 +1,5 @@
 from gate_control import REVERE
-from gate_control.__classes__.Sensor import Relay
+from gate_control.__classes__.Switch import Relay
 from gate_control.config import RELAYS,DOOR_TRAVEL_TIME,CADENCE
 
 from datetime import datetime
