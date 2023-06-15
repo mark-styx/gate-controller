@@ -1,6 +1,5 @@
 from gate_control import GPIO
 from gate_control.config import SENSORS,RELAYS,DOOR_TRAVEL_TIME,START_STATE,METHOD
-from gate_control.__classes__.Sensor import Sense
 from gate_control.__classes__.Switch import Relay
 
 from time import sleep
@@ -10,7 +9,6 @@ class Gate:
     def __init__(
             self
             ,RELAYS=RELAYS
-            ,SENSORS=SENSORS
             ,METHOD=METHOD
             ,START_STATE=START_STATE
             ) -> None:
@@ -18,20 +16,14 @@ class Gate:
         self.last_state = START_STATE
         self.last_activation = dt.now().timestamp()
         self.__relay_meta = RELAYS
-        self.__sensor_meta = SENSORS
         self.__initialize_assets__()
 
-    def all_off(self):
+    def _reset_relays(self):
         for relay in self.RELAYS:
             relay.open()
 
-
     def __initialize_assets__(self):
         self.RELAYS = {x:Relay(gpio=y) for x,y in self.__relay_meta['GPIO'].items()}
-        self.SENSORS = {x:Sense(gpio=y) for x,y in self.__sensor_meta['GPIO'].items()}
-    
-    def __BT_SENSE_STATE__(self):
-        return self.SENSORS['BT'].get_state()  
 
     def __opposite_direction__(self,current_state):
         return {
@@ -39,14 +31,6 @@ class Gate:
             , 'DN':'UP'
             , 'NA':'DN'
         }[current_state]
-
-
-    def api_activate(self,direction):
-        relay = self.RELAYS[direction]
-        relay.close()
-        sleep(DOOR_TRAVEL_TIME)
-        relay.open()
-
 
     def activate(self):
         t = dt.now().timestamp()
@@ -57,22 +41,6 @@ class Gate:
         return tgt,t
 
 
-    def control_flow(self):
-        tgt,t = None,dt.now().timestamp()
-        active = 0
-        while True:
-            if (
-                self.__BT_SENSE_STATE__()
-                and dt.now().timestamp() - t >= 1
-                ):
-                tgt,t = self.activate()
-                active = 1
-            if (active) and (dt.now().timestamp() - t >= DOOR_TRAVEL_TIME):
-                self.RELAYS[tgt].open()
-                active = 0
-            sleep(SENSORS['PING'])
-
 
 if __name__ == '__main__':
-    Gate().control_flow()   
     GPIO.cleanup()

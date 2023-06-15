@@ -28,3 +28,12 @@ Gate
         - History
         - Log
         - Status
+
+probably go back to the handler idea; 
+the current issue is having a useful event queue
+that can handle interuptions
+
+
+handler - read and react to events msg api when done
+api - create events
+|_ sensors - message api

@@ -1,8 +1,7 @@
 from gate_control import GPIO
+from gate_control.config import PULSE_DELAY,PULSE
 from time import sleep
 
-PULSE = 1
-DELAY = .5
 class Relay:
 
     def __init__(self,gpio,id) -> None:
@@ -15,7 +14,7 @@ class Relay:
         print(f'relay {self.id} reset')
         GPIO.output(self.gpio['OFF'], 0)
         GPIO.output(self.gpio['ON'], 0)
-        sleep(DELAY)
+        sleep(PULSE_DELAY)
     
     def _pulse(self,switch):
         print(f'pulse {self.id} {switch}')

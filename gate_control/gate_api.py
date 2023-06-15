@@ -1,18 +1,30 @@
-from flask import Flask,request
 from gate_control.control import *
+from gate_control import REVERE
 
-HelmsDeep = Gate()
+from flask import Flask,request
+from datetime import datetime as dt
 
 app = Flask(__name__)
 @app.route('/gate/open', methods=['post'])
 def gate_open():
-   HelmsDeep.api_activate('UP')
-   return 'opened'
+   if request.data.get('mock'):
+      return 'Mock Open Request'
+   REVERE.mset({"task":"UP","t":dt.now().timestamp()})
+   return 'opening'
 
 @app.route('/gate/close', methods=['post'])
 def gate_close():
-   HelmsDeep.api_activate('DN')
-   return 'closed'
+   if request.data.get('mock'):
+      return 'Mock Close Request'
+   REVERE.mset({"task":"DN","t":dt.now().timestamp()})
+   return 'closing'
+
+@app.route('/gate/status', methods=['get'])
+def gate_close():
+   if request.data.get('mock'):
+      return 'Mock Status Request'
+   return REVERE.get("state")
+
 
 if __name__ == '__main__':
     app.run(port=8081)
