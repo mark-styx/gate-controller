@@ -11,6 +11,7 @@ DN = Relay(gpio=RELAYS["GPIO"]["DN"],id='DN')
 
 relays = {'UP':UP,'DN':DN}
 state_msg = {'UP':'Opening','DN':'Closing'}
+initial_state = {'task':'DN','t':datetime.now().timestamp(),'state':'Complete'}
 
 def interrupt(relay:Relay,mock:bool):
     if mock:
@@ -25,6 +26,7 @@ def activate(relay:Relay,mock:bool):
     return f'{relay.id} Activate'
 
 def control_flow(mock:bool):
+    REVERE.mset(initial_state)
     task,t,state = REVERE.mget("task","t","status")
     while True:
         ctask,ct = REVERE.mget("task","t")
