@@ -5,7 +5,7 @@ class Sense:
     def __init__(self,gpio,id) -> None:
         self.id = id
         self.gpio = gpio
-        GPIO.setup(self.gpio, GPIO.IN, pull_up_down=GPIO.PUD_DN)
+        GPIO.setup(self.gpio, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def get_state(self)->bool:
         state = GPIO.input(self.gpio)
