@@ -7,7 +7,7 @@ from time import sleep
 import requests,argparse
 
 
-Button = Sense(gpio=SENSORS['BT'],id='momentary switch')
+Button = Sense(gpio=SENSORS['GPIO']['BT'],id='momentary switch')
 tchk = lambda: dt.now().timestamp()
 
 def send_gate_signal(self,mock):

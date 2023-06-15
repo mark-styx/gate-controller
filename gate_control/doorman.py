@@ -6,8 +6,8 @@ from datetime import datetime
 from time import sleep
 import argparse
 
-UP = Relay(gpio=RELAYS["UP"],id='UP')
-DN = Relay(gpio=RELAYS["DN"],id='DN')
+UP = Relay(gpio=RELAYS["GPIO"]["UP"],id='UP')
+DN = Relay(gpio=RELAYS["GPIO"]["DN"],id='DN')
 
 relays = {'UP':UP,'DN':DN}
 state_msg = {'UP':'Opening','DN':'Closing'}
