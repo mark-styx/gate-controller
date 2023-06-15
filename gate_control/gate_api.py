@@ -20,7 +20,7 @@ def gate_close():
    return 'closing'
 
 @app.route('/gate/status', methods=['get'])
-def gate_close():
+def gate_status():
    if request.data.get('mock'):
       return 'Mock Status Request'
    return REVERE.get("state")
