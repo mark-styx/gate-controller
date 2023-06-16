@@ -35,7 +35,7 @@ def control_flow(mock:bool):
             task,t = ctask,ct
             state = state_msg[task]
             REVERE.set("state",state)
-            print(activate(task=task,mock=mock))
+            print(activate(relay=relays[task],mock=mock))
         if (
             datetime.now().timestamp() - float(t)
          ) and (
