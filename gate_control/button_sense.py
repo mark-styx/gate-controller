@@ -1,10 +1,9 @@
-from gate_control import GPIO
 from gate_control.config import SENSORS,HOST
 from gate_control.__classes__.Sensor import Sense
 
 from datetime import datetime as dt
 from time import sleep
-import requests,argparse
+import requests,argparse,json
 
 
 Button = Sense(gpio=SENSORS['GPIO']['BT'],id='momentary switch')
@@ -13,7 +12,7 @@ tchk = lambda: dt.now().timestamp()
 def send_gate_signal(mock):
     resp = requests.post(f'http://{HOST}/gate/activate'
                          , headers={'content-type':'application/json'}
-                         , data={'mock':mock})
+                         , data=json.dumps({'mock':mock}))
     print(resp.status_code,resp.content)
     return resp
 
