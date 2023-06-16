@@ -16,7 +16,7 @@ def __opposite_direction__(current_state):
    target = travel.get(current_state)
    if not target:
       target = REVERE.get('task')
-   retrun target
+   return target
 
 
 app = Flask(__name__)
