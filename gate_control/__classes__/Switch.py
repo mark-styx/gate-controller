@@ -27,4 +27,4 @@ class Relay:
         self._pulse('ON')
 
     def open(self):
-        self._pulse['OFF']
+        self._pulse('OFF')
