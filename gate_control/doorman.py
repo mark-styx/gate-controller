@@ -11,7 +11,7 @@ DN = Relay(gpio=RELAYS["GPIO"]["DN"],id='DN')
 
 relays = {'UP':UP,'DN':DN}
 state_msg = {'UP':'Opening','DN':'Closing'}
-initial_state = {'task':'DN','t':datetime.now().timestamp(),'state':'Complete'}
+initial_state = {'task':'DN','t':datetime.now().timestamp(),'state':'DN'}
 
 def interrupt(relay:Relay,mock:bool):
     if mock:
