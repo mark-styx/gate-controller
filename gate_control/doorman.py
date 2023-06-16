@@ -39,11 +39,11 @@ def control_flow(mock:bool):
         if (
             datetime.now().timestamp() - float(t)
          ) and (
-            state != 'Complete'
+            state != task
          ) >= DOOR_TRAVEL_TIME:
             print(interrupt(mock=mock))
-            state = 'Complete'
-            REVERE.set("state","Complete")
+            state = task
+            REVERE.set("state",task)
         sleep(CADENCE)
 
 

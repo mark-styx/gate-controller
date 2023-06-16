@@ -22,6 +22,7 @@ def button_control_flow(mock=False):
     check the state of the momentary switch at a defined cadence
     if activated, send data to api to trigger the gate
     '''
+
     t = dt.now().timestamp()
     while True:
         if Button.get_state() and t - tchk() >= 1:
