@@ -39,7 +39,7 @@ def gate_activate():
       sleep(CADENCE)
    return cstate
 
-@app.route('/gate/status', methods=['get'])
+@app.route('/gate/status', methods=['post'])
 def gate_status():
    if request.json.get('mock'):
       msg = 'Mock Status Request'
