@@ -37,7 +37,7 @@ def control_flow(mock:bool):
             REVERE.set("state",state)
             print(activate(relay=relays[task],mock=mock))
         if (
-            datetime.now().timestamp() - float(t)
+            datetime.now().timestamp() - float(t) >= 10
          ) and (
             state != task
          ) >= DOOR_TRAVEL_TIME:
