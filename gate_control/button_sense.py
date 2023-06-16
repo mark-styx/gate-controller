@@ -24,7 +24,7 @@ def button_control_flow(mock=False):
     '''
     t = dt.now().timestamp()
     while True:
-        if not(Button.get_state()) and t - tchk() >= 1:
+        if Button.get_state() and t - tchk() >= 1:
             send_gate_signal(mock)
             t = tchk()
         sleep(SENSORS['PING'])
