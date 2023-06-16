@@ -33,7 +33,6 @@ def gate_activate():
       print(msg)
       return msg
    task = __opposite_direction__(cstate)
-   if not task
    REVERE.mset({"task":task,"t":ts()})
    while cstate not in ['Opening','Closing']:
       cstate = REVERE.get("state")
