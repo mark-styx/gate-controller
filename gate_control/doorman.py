@@ -31,7 +31,7 @@ def control_flow(mock:bool):
     while True:
         ctask,ct = REVERE.mget("task","t")
         if (ctask,ct) != (task,t):
-            print(interrupt(relay=task,mock=mock))
+            print(interrupt(relay=relays[task],mock=mock))
             task,t = ctask,ct
             state = state_msg[task]
             REVERE.set("state",state)
@@ -41,7 +41,7 @@ def control_flow(mock:bool):
          ) and (
             state != task
          ) >= DOOR_TRAVEL_TIME:
-            print(interrupt(relay=task,mock=mock))
+            print(interrupt(relay=relays[task],mock=mock))
             state = task
             REVERE.set("state",task)
         sleep(CADENCE)
