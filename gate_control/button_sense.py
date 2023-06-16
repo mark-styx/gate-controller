@@ -10,7 +10,7 @@ import requests,argparse
 Button = Sense(gpio=SENSORS['GPIO']['BT'],id='momentary switch')
 tchk = lambda: dt.now().timestamp()
 
-def send_gate_signal(self,mock):
+def send_gate_signal(mock):
     resp = requests.post(f'http://{HOST}/gate/activate'
                          , headers={'content-type':'application/json'}
                          , data={'mock':mock})
