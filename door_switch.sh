@@ -1,1 +1,1 @@
-python3 $gate_dir/gate.py
+python3 -m gate_control.button_sense -m 1
