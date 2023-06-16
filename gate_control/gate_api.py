@@ -8,11 +8,15 @@ from time import sleep
 ts = lambda:dt.now().timestamp()
 
 def __opposite_direction__(current_state):
-        return {
-              'UP':'DN'
-            , 'DN':'UP'
-            , 'NA':'DN'
-        }[current_state]
+   travel = {
+         'UP':'DN'
+      , 'DN':'UP'
+      , 'NA':'DN'
+   }
+   target = travel.get(current_state)
+   if not target:
+      target = REVERE.get('task')
+   retrun target
 
 
 app = Flask(__name__)
@@ -29,6 +33,7 @@ def gate_activate():
       print(msg)
       return msg
    task = __opposite_direction__(cstate)
+   if not task
    REVERE.mset({"task":task,"t":ts()})
    while cstate not in ['Opening','Closing']:
       cstate = REVERE.get("state")
