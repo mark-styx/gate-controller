@@ -1,1 +1,1 @@
-python3 -m gate_control.doorman -m 1
+python3 -m gate_control.doorman -m 0
