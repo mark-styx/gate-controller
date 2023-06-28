@@ -8,17 +8,5 @@ User=root
 WorkingDirectory=/home/gate/gate-controller
 ExecStart=/home/gate/gate-controller/doorman.sh
 
-[Service]
-Restart=always
-User=root
-WorkingDirectory=/home/gate/gate-controller
-ExecStart=/home/gate/gate-controller/gate_api.sh
-
-[Service]
-Restart=always
-User=root
-WorkingDirectory=/home/gate/gate-controller
-ExecStart=/home/gate/gate-controller/door_switch.sh
-
 [Install]
 WantedBy=multi-user.target
