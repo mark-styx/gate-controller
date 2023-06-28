@@ -7,7 +7,7 @@ Requires=gate_api
 Restart=always
 User=gate
 WorkingDirectory=/home/gate/gate-controller
-ExecStart=/home/gate/gate-controller/door_switch.sh
+ExecStart=sh /home/gate/gate-controller/door_switch.sh
 
 [Install]
 WantedBy=multi-user.target

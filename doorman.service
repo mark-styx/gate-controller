@@ -6,7 +6,7 @@ Requires=redis-server
 Restart=always
 User=gate
 WorkingDirectory=/home/gate/gate-controller
-ExecStart=/home/gate/gate-controller/doorman.sh
+ExecStart=sh /home/gate/gate-controller/doorman.sh
 
 [Install]
 WantedBy=multi-user.target

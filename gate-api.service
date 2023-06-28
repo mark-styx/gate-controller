@@ -6,7 +6,7 @@ Wants=doorman
 Restart=always
 User=gate
 WorkingDirectory=/home/gate/gate-controller
-ExecStart=/home/gate/gate-controller/gate_api.sh
+ExecStart=sh /home/gate/gate-controller/gate_api.sh
 
 [Install]
 WantedBy=multi-user.target
