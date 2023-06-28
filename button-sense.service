@@ -1,0 +1,13 @@
+[Unit]
+Description=Cheesys palace garage door opener
+Wants=doorman
+Requires=gate_api
+
+[Service]
+Restart=always
+User=root
+WorkingDirectory=/home/gate/gate-controller
+ExecStart=/home/gate/gate-controller/door_switch.sh
+
+[Install]
+WantedBy=multi-user.target

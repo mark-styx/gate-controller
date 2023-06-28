@@ -1,0 +1,4 @@
+cp doorman.service /lib/systemd/system/doorman.service
+cp gate-api.service /lib/systemd/system/gate-api.service
+cp button-sense.service /lib/systemd/system/button-sense.service
+systemctl daemon-reload
