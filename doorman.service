@@ -4,7 +4,7 @@ Requires=redis-server
 
 [Service]
 Restart=always
-User=root
+User=gate
 WorkingDirectory=/home/gate/gate-controller
 ExecStart=/home/gate/gate-controller/doorman.sh
 
