@@ -1,23 +1,24 @@
 [Unit]
-Description=Cheesy's palace garage door opener
+Description=Cheesys palace garage door opener
+Requires=redis-server
 
 [Service]
 Restart=always
 User=root
 WorkingDirectory=/home/gate/gate-controller
-ExecStart=sh /home/gate/gate-controller/doorman.sh
+ExecStart=/home/gate/gate-controller/doorman.sh
 
 [Service]
 Restart=always
 User=root
 WorkingDirectory=/home/gate/gate-controller
-ExecStart=sh /home/gate/gate-controller/gate_api.sh
+ExecStart=/home/gate/gate-controller/gate_api.sh
 
 [Service]
 Restart=always
 User=root
 WorkingDirectory=/home/gate/gate-controller
-ExecStart=sh /home/gate/gate-controller/door_switch.sh
+ExecStart=/home/gate/gate-controller/door_switch.sh
 
 [Install]
 WantedBy=multi-user.target
