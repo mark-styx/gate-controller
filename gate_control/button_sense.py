@@ -28,13 +28,14 @@ def button_control_flow(mock=False):
     Check the state of the momentary switch at a defined cadence.
     If activated, sends message to the doorman and waits for feedback.
     '''
-
+    hist = []
     t = dt.now().timestamp()
     while True:
         if Button.get_state() and (ts() - t >= 1):
             if mock:
                 print('mock button activation')
             else:
+                hist.append(1)
                 t = ts()
                 cstate,ct = REVERE.mget(["state","t"])
                 if t - float(ct) < 1:
@@ -50,9 +51,21 @@ def button_control_flow(mock=False):
                     while cstate not in ['Opening','Closing']:
                         cstate = REVERE.get("state")
                         sleep(CADENCE)
+        elif Button.get_state() and not (ts() - t >= 1):
+            if mock:
+                print('mock button duplicate activation')
+            else:
+                hist.append(1)
+                msg = 'Not enough time between button senses, ignoring'
+                print(msg)
         else:
-            msg = 'Not enough time between button senses, ignoring'
-            print(msg)
+            hist.append(0)
+        hist = hist[:30]   
+        if sum(hist) == 30:
+            print('triggering ebrake')
+            ebrake = REVERE.get('ebrake')
+            new = {'ON':'OFF','OFF':'ON'}[ebrake]
+            REVERE.mset({'ebrake':new,'ebrake_eid':ts()})
         sleep(SENSORS['PING'])
 
 

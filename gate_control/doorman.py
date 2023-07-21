@@ -11,7 +11,13 @@ DN = Relay(gpio=RELAYS["GPIO"]["DN"],id='DN')
 
 relays = {'UP':UP,'DN':DN}
 state_msg = {'UP':'Opening','DN':'Closing'}
-initial_state = {'task':'DN','t':dt.now().timestamp(),'state':'DN'}
+initial_state = {
+    'task':'DN'
+    ,'t':dt.now().timestamp()
+    ,'state':'DN'
+    ,'ebrake':'OFF'
+    ,'ebrake_eid':dt.now().timestamp()
+}
 motion_states = ['Opening','Closing']
 
 ts = lambda:dt.now().timestamp()
@@ -28,12 +34,20 @@ def activate(relay:Relay,mock:bool):
     relay.close()
     return f'{relay.id} Activate'
 
+def ebrake():
+    for relay in relays.values():
+        interrupt(relay)
+
 def control_flow(mock:bool):
     REVERE.mset(initial_state)
-    task,t,state = REVERE.mget("task","t","status")
-    partial_travel_time = 0
+    task,t,state,ebrake_eid = REVERE.mget("task","t","state","ebrake_eid")
+    partial_travel_time
     while True:
         ctask,ct = REVERE.mget("task","t")
+        if REVERE.get('ebrake')=='ON':
+            if REVERE.get('ebrake_eid')!=ebrake_eid:
+                ebrake()
+                ebrake_eid = REVERE.get('ebrake_eid')
         if (ctask,ct) != (task,t):
             print(interrupt(relay=relays[task],mock=mock))
             partial_travel_time = ts() - float(t) if state in motion_states else 0
