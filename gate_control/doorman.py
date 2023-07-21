@@ -29,6 +29,7 @@ def activate(relay:Relay,mock:bool):
 def control_flow(mock:bool):
     REVERE.mset(initial_state)
     task,t,state = REVERE.mget("task","t","status")
+    partial_travel_time = 0
     while True:
         ctask,ct = REVERE.mget("task","t")
         if (ctask,ct) != (task,t):
