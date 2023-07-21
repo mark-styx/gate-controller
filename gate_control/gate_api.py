@@ -9,14 +9,12 @@ ts = lambda:dt.now().timestamp()
 
 def __opposite_direction__(current_state):
    travel = {
-         'UP':'DN'
+        'UP':'DN'
       , 'DN':'UP'
-      , 'NA':'DN'
+      , 'Opening':'DN'
+      , 'Closing':'UP'
    }
-   target = travel.get(current_state)
-   if not target:
-      target = REVERE.get('task')
-   return target
+   return travel.get(current_state)
 
 
 app = Flask(__name__)
@@ -33,7 +31,10 @@ def gate_activate():
       print(msg)
       return msg
    task = __opposite_direction__(cstate)
-   REVERE.mset({"task":task,"t":ts()})
+   if task:
+      REVERE.mset({"task":task,"t":ts()})
+   else:
+      return 'Error: Improper Target'
    while cstate not in ['Opening','Closing']:
       cstate = REVERE.get("state")
       sleep(CADENCE)

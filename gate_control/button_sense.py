@@ -13,9 +13,10 @@ ts = lambda:dt.now().timestamp()
 
 def __opposite_direction__(current_state):
    travel = {
-         'UP':'DN'
+        'UP':'DN'
       , 'DN':'UP'
-      , 'NA':'DN'
+      , 'Opening':'DN'
+      , 'Closing':'UP'
    }
    target = travel.get(current_state)
    if not target:
@@ -33,18 +34,25 @@ def button_control_flow(mock=False):
         if Button.get_state() and (ts() - t >= 1):
             if mock:
                 print('mock button activation')
-        else:
-            t = ts()
-            cstate,ct = REVERE.mget(["state","t"])
-            if t - float(ct) < 1:
-                msg = 'Not enough time between requests, ignoring'
-                print(msg)
             else:
-                task = __opposite_direction__(cstate)
-                REVERE.mset({"task":task,"t":t})
-                while cstate not in ['Opening','Closing']:
-                    cstate = REVERE.get("state")
-                    sleep(CADENCE)
+                t = ts()
+                cstate,ct = REVERE.mget(["state","t"])
+                if t - float(ct) < 1:
+                    msg = 'Not enough time between requests, ignoring'
+                    print(msg)
+                else:
+                    task = __opposite_direction__(cstate)                    
+                    if task:
+                        REVERE.mset({"task":task,"t":ts()})
+                    else:
+                        print('Error: Improper Target')
+                        continue
+                    while cstate not in ['Opening','Closing']:
+                        cstate = REVERE.get("state")
+                        sleep(CADENCE)
+        else:
+            msg = 'Not enough time between button senses, ignoring'
+            print(msg)
         sleep(SENSORS['PING'])
 
 
