@@ -1,32 +1,50 @@
-from gate_control.config import SENSORS,HOST
+from gate_control import REVERE
+from gate_control.config import CADENCE
+from gate_control.config import SENSORS
 from gate_control.__classes__.Sensor import Sense
 
 from datetime import datetime as dt
 from time import sleep
-import requests,argparse,json
+import argparse
 
 
 Button = Sense(gpio=SENSORS['GPIO']['BT'],id='momentary switch')
-tchk = lambda: dt.now().timestamp()
+ts = lambda:dt.now().timestamp()
 
-def send_gate_signal(mock):
-    resp = requests.post(f'http://{HOST}/gate/activate'
-                         , headers={'content-type':'application/json'}
-                         , data=json.dumps({'mock':mock}))
-    print(resp.status_code,resp.content)
-    return resp
+def __opposite_direction__(current_state):
+   travel = {
+         'UP':'DN'
+      , 'DN':'UP'
+      , 'NA':'DN'
+   }
+   target = travel.get(current_state)
+   if not target:
+      target = REVERE.get('task')
+   return target
 
 def button_control_flow(mock=False):
     '''
-    check the state of the momentary switch at a defined cadence
-    if activated, send data to api to trigger the gate
+    Check the state of the momentary switch at a defined cadence.
+    If activated, sends message to the doorman and waits for feedback.
     '''
 
     t = dt.now().timestamp()
     while True:
-        if Button.get_state() and (tchk() - t >= 1):
-            send_gate_signal(mock)
-            t = tchk()
+        if Button.get_state() and (ts() - t >= 1):
+            if mock:
+                print('mock button activation')
+        else:
+            t = ts()
+            cstate,ct = REVERE.mget(["state","t"])
+            if t - float(ct) < 1:
+                msg = 'Not enough time between requests, ignoring'
+                print(msg)
+            else:
+                task = __opposite_direction__(cstate)
+                REVERE.mset({"task":task,"t":t})
+                while cstate not in ['Opening','Closing']:
+                    cstate = REVERE.get("state")
+                    sleep(CADENCE)
         sleep(SENSORS['PING'])
 
 
