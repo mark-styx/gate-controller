@@ -50,14 +50,14 @@ def gate_status():
 
 @app.route('/gate/ebrake', methods=['post','get'])
 def gate_ebrake():
-   if request.json.get('mock'):
-      msg = 'Mock Status Request'
-      print(msg)
-      return msg
    ebrake = REVERE.get('ebrake')
    if request.method.lower() == 'get':
       return f'ebrake: {ebrake}'
    elif request.method.lower() == 'post':
+      if request.json.get('mock'):
+         msg = 'Mock Status Request'
+         print(msg)
+         return msg
       new = {'ON':'OFF','OFF':'ON'}[ebrake]
       REVERE.mset({'ebrake':new,'ebrake_eid':ts()})
       return f'setting ebrake: {new}'
