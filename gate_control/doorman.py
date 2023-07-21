@@ -41,7 +41,7 @@ def ebrake():
 def control_flow(mock:bool):
     REVERE.mset(initial_state)
     task,t,state,ebrake_eid = REVERE.mget("task","t","state","ebrake_eid")
-    partial_travel_time
+    partial_travel_time = 0
     while True:
         ctask,ct = REVERE.mget("task","t")
         if REVERE.get('ebrake')=='ON':
