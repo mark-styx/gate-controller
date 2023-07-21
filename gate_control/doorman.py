@@ -39,7 +39,7 @@ def control_flow(mock:bool):
             REVERE.set("state",state)
             print(activate(relay=relays[task],mock=mock))
         if (
-            datetime.now().timestamp() - float(t) >= DOOR_TRAVEL_TIME if not partial_travel_time else partial_travel_time
+            datetime.now().timestamp() - float(t) >= (DOOR_TRAVEL_TIME if not partial_travel_time else partial_travel_time)
          ) and (state != task):
             print(interrupt(relay=relays[task],mock=mock))
             state = task
