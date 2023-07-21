@@ -34,13 +34,13 @@ def control_flow(mock:bool):
         ctask,ct = REVERE.mget("task","t")
         if (ctask,ct) != (task,t):
             print(interrupt(relay=relays[task],mock=mock))
-            partial_travel_time = float(ct) - float(t) if state in motion_states else 0
+            #partial_travel_time = float(ct) - float(t) if state in motion_states else 0
             task,t = ctask,ct
             state = state_msg[task]
             REVERE.set("state",state)
             print(activate(relay=relays[task],mock=mock))
         if (
-            datetime.now().timestamp() - float(t) >= (DOOR_TRAVEL_TIME if not partial_travel_time else partial_travel_time)
+            datetime.now().timestamp() - float(t) >= DOOR_TRAVEL_TIME #if not partial_travel_time else partial_travel_time
          ) and (state != task):
             print(interrupt(relay=relays[task],mock=mock))
             state = task
