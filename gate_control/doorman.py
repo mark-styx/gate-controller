@@ -2,7 +2,7 @@ from gate_control import REVERE
 from gate_control.__classes__.Switch import Relay
 from gate_control.config import RELAYS,DOOR_TRAVEL_TIME,CADENCE
 
-from datetime import datetime
+from datetime import datetime as dt
 from time import sleep
 import argparse
 
@@ -11,8 +11,10 @@ DN = Relay(gpio=RELAYS["GPIO"]["DN"],id='DN')
 
 relays = {'UP':UP,'DN':DN}
 state_msg = {'UP':'Opening','DN':'Closing'}
-initial_state = {'task':'DN','t':datetime.now().timestamp(),'state':'DN'}
+initial_state = {'task':'DN','t':dt.now().timestamp(),'state':'DN'}
 motion_states = ['Opening','Closing']
+
+ts = lambda:dt.now().timestamp()
 
 def interrupt(relay:Relay,mock:bool):
     if mock:
@@ -34,13 +36,13 @@ def control_flow(mock:bool):
         ctask,ct = REVERE.mget("task","t")
         if (ctask,ct) != (task,t):
             print(interrupt(relay=relays[task],mock=mock))
-            partial_travel_time = float(ct) - float(t) if state in motion_states else 0
+            partial_travel_time = ts() - float(t) if state in motion_states else 0
             task,t = ctask,ct
             state = state_msg[task]
             REVERE.set("state",state)
             print(activate(relay=relays[task],mock=mock))
         if (
-            datetime.now().timestamp() - float(t) >= DOOR_TRAVEL_TIME if not partial_travel_time else partial_travel_time
+            dt.now().timestamp() - float(t) >= DOOR_TRAVEL_TIME if not partial_travel_time else partial_travel_time
          ) and (state != task):
             print(interrupt(relay=relays[task],mock=mock))
             state = task
