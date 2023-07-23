@@ -84,7 +84,7 @@ def stream_handler():
     if new_events:
         event = new_events.pop()
         REVERE.rpush(CONSUMED,event)
-        action_wrapper(action_triage(events[event]['action']))
+        action_wrapper(action_triage(events[event]['action']))()
 
 
 def get_relay_states()->list:
