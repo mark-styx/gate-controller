@@ -34,7 +34,7 @@ def eval_history(hist:dict)->dict:
     keys.sort()
     keys = keys[-30:]
     current_activations = [x for x in keys if x >= ts() - 1]
-    prev_activations = [x for x in hist if x.get('state') and x not in current_activations]
+    prev_activations = [k for k,v in hist if v.get('state') and k not in current_activations]
     action_space = {
           'ebrake':len(current_activations+prev_activations) == 30
         #, 'partial_activation':prev_activations and current_activations and ((min(current_activations) - max(prev_activations)) >= 1)
