@@ -40,12 +40,14 @@ def eval_history(hist:dict)->dict:
           'ebrake':len(current_activations+prev_activations) == 30
         , 'activation':not(len(current_activations+prev_activations)) and current_activations
     }
-    action = [k for k,v in action_space.items() if v].pop()
+    action = [k for k,v in action_space.items() if v]
+    if action:
+        action = action.pop()
     if not any([x for x in hist['mock']]):
         event(action=action)
     else:
         print(f'mock {action}')
-    return {k:v for k,v in hist if k in keys}
+    return {k:v for k,v in hist.items() if k in keys}
 
 
 def button_control_flow(mock=False):
