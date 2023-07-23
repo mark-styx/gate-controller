@@ -63,7 +63,7 @@ def action_triage(action):
     triage = [k for k,v in {
          'activate': not ebrake_state and action == 'activate'
         ,'ebrake': action == 'ebrake'
-    } if v]
+    }.items() if v]
     if len(triage) == 0:
         return triage.pop()
     elif len(triage) > 1:

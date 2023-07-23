@@ -35,12 +35,12 @@ def eval_history(hist:dict)->dict:
     keys.sort()
     keys = keys[-30:]
     current_activations = [x for x in keys if x >= ts() - 1]
-    prev_activations = [k for k,v in hist if v.get('state') and k not in current_activations]
+    prev_activations = [k for k,v in hist.items() if v.get('state') and k not in current_activations]
     action_space = {
           'ebrake':len(current_activations+prev_activations) == 30
         , 'activation':not(len(current_activations+prev_activations)) and current_activations
     }
-    action = [k for k,v in action_space if v].pop()
+    action = [k for k,v in action_space.items() if v].pop()
     if not any([x for x in hist['mock']]):
         event(action=action)
     else:
