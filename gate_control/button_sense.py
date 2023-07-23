@@ -21,9 +21,15 @@ def epoch(
         ,'mock':mock
     }
 
-
-
 def eval_history(hist:dict)->dict:
+    '''
+    params:
+        hist:dict - The dictionary containing the historical data for the button sense iterator.
+    Takes the historical data and evaluates what actions if any should occur as a result of the event history and outputs a truncated version of the history.
+
+    returns:
+        hist:dict
+    '''
     keys = list(hist.keys())
     keys.sort()
     keys = keys[-30:]
@@ -31,12 +37,14 @@ def eval_history(hist:dict)->dict:
     prev_activations = [x for x in hist if x.get('state') and x not in current_activations]
     action_space = {
           'ebrake':len(current_activations+prev_activations) == 30
-        , 'partial_activation':prev_activations and current_activations and ((min(current_activations) - max(prev_activations)) >= 1)
-        , 'activation':not(prev_activations) and current_activations
+        #, 'partial_activation':prev_activations and current_activations and ((min(current_activations) - max(prev_activations)) >= 1)
+        , 'activation':not(len(current_activations+prev_activations)) and current_activations
     }
-    e = [k for k,v in action_space if v].pop()
-    action = event(action=e)
-    action.add_event()
+    action = [k for k,v in action_space if v].pop()
+    if not any([x for x in hist['mock']]):
+        event(action=action)
+    else:
+        print(f'mock {action}')
     return {k:v for k,v in hist if k in keys}
 
 

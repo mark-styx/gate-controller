@@ -1,6 +1,6 @@
 from gate_control import REVERE
 from gate_control.__classes__.Switch import Relay
-from gate_control.config import RELAYS,DOOR_TRAVEL_TIME,CADENCE
+from gate_control.config import RELAYS,DOOR_TRAVEL_TIME,CADENCE,STREAM,CONSUMED
 
 from datetime import datetime as dt
 from time import sleep
@@ -9,63 +9,123 @@ import argparse
 UP = Relay(gpio=RELAYS["GPIO"]["UP"],id='UP')
 DN = Relay(gpio=RELAYS["GPIO"]["DN"],id='DN')
 
+'''
+consume events from stream and pass them to consumed queue
+handle consumed events gracefully
+'''
+
+door_state = 'DN'
+ebrake_state = 0
 relays = {'UP':UP,'DN':DN}
 state_msg = {'UP':'Opening','DN':'Closing'}
-initial_state = {
-    'task':'DN'
-    ,'t':dt.now().timestamp()
-    ,'state':'DN'
-    ,'ebrake':'OFF'
-    ,'ebrake_eid':dt.now().timestamp()
-}
-motion_states = ['Opening','Closing']
-
 ts = lambda:dt.now().timestamp()
 
-def interrupt(relay:Relay,mock:bool):
-    if mock:
-        return 'Mock Interrupt'
+# Handle Door Events
+def interrupt(relay:Relay):
+    if MOCK:
+        return 'MOCK Interrupt'
     relay.open()
     return 'Interrupt'
 
-def activate(relay:Relay,mock:bool):
-    if mock:
-        return 'Mock Activate'
+def activate(relay:Relay):
+    if MOCK:
+        return 'MOCK Activate'
     relay.close()
     return f'{relay.id} Activate'
 
 def ebrake():
-    for relay in relays.values():
-        interrupt(relay)
+    if not ebrake_state:
+        ebrake_state = 1
+        for relay in relays.values():
+            interrupt(relay)
+    else: ebrake_state = 0
 
-def control_flow(mock:bool):
-    REVERE.mset(initial_state)
-    task,t,state,ebrake_eid = REVERE.mget("task","t","state","ebrake_eid")
-    partial_travel_time = 0
+def activation_flow():
+    active_relay =  get_active_relay()
+    direction = get_opposite_direction()
+    door_state = new_door_state(direction)
+    if active_relay:
+        travel = travel_time(active_relay.get('t'))
+        interrupt(relays[active_relay['relay']])
+    else:
+        travel = DOOR_TRAVEL_TIME
+    activate(relays[direction])
+    return travel
+
+
+def action_wrapper(action)->function:
+    return {
+          'activate':activation_flow
+        , 'ebrake':ebrake
+    }
+
+def action_triage(action):
+    triage = [k for k,v in {
+         'activate': not ebrake_state and action == 'activate'
+        ,'ebrake': action == 'ebrake'
+    } if v]
+    if len(triage) == 0:
+        return triage.pop()
+    elif len(triage) > 1:
+        Exception('Error: Conflicting Events')
+    else:
+        return
+
+
+# Consume and evaluate stream
+def stream_handler():
+    events = REVERE.xread(streams={STREAM:0})[0][1]
+    keys = [k[0] for k in events]
+    consumed = REVERE.lrange(CONSUMED,0,REVERE.llen(CONSUMED))
+    new_events = [x for x in keys if x not in consumed]
+    if new_events:
+        event = new_events.pop()
+        REVERE.rpush(CONSUMED,event)
+        action_triage(events[event]['action'])
+
+
+def get_relay_states()->list:
+    return [relay.state() for relay in relays]
+
+def get_active_relay()->dict:
+    R = [x for x in get_relay_states() if x.get('state')]
+    if R:
+        return R.pop()
+
+def get_opposite_direction()->str:
+    return {
+         'DN':'UP'
+        ,'UP':'DN'
+        ,'Closing':'UP'
+        ,'Opening':'DN'
+    }[door_state]
+
+def new_door_state(direction):
+    return {
+         'DN':'Closing'
+        ,'UP':'Opening'
+    }[direction]
+
+def travel_time(start:float):
+    return max(DOOR_TRAVEL_TIME/2,(ts()-start))
+
+def set_state():
+    REVERE.mset({
+        't':dt.now().timestamp()
+        ,'state':door_state
+        ,'ebrake':ebrake_state
+    })
+
+def control_flow():
     while True:
-        ctask,ct = REVERE.mget("task","t")
-        if REVERE.get('ebrake')=='ON':
-            if REVERE.get('ebrake_eid')!=ebrake_eid:
-                ebrake()
-                ebrake_eid = REVERE.get('ebrake_eid')
-        if (ctask,ct) != (task,t):
-            print(interrupt(relay=relays[task],mock=mock))
-            partial_travel_time = ts() - float(t) if state in motion_states else 0
-            task,t = ctask,ct
-            state = state_msg[task]
-            REVERE.set("state",state)
-            print(activate(relay=relays[task],mock=mock))
-        if (
-            dt.now().timestamp() - float(t) >= DOOR_TRAVEL_TIME if not partial_travel_time else partial_travel_time
-         ) and (state != task):
-            print(interrupt(relay=relays[task],mock=mock))
-            state = task
-            REVERE.set("state",task)
+        set_state()
+        stream_handler()
         sleep(CADENCE)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--mock", type=int, help = "Mock Status")
+    parser.add_argument("-m", "--MOCK", type=int, help = "MOCK Status")
     args = parser.parse_args()
-    control_flow(mock=args.mock)
+    MOCK=args.MOCK
+    control_flow()

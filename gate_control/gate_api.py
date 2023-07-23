@@ -1,5 +1,6 @@
 from gate_control import REVERE
-from gate_control.config import CADENCE
+from gate_control.config import DOOR_TRAVEL_TIME
+from gate_control.__classes__.Events import event
 
 from flask import Flask,request
 from datetime import datetime as dt
@@ -7,38 +8,25 @@ from time import sleep
 
 ts = lambda:dt.now().timestamp()
 
-def __opposite_direction__(current_state):
-   travel = {
-        'UP':'DN'
-      , 'DN':'UP'
-      , 'Opening':'DN'
-      , 'Closing':'UP'
-   }
-   return travel.get(current_state)
-
-
 app = Flask(__name__)
+last = 0
+
+'''
+keep list of ts's and then compare the last two to see if a partial 
+execution is required.
+'''
+
 @app.route('/gate/activate', methods=['post'])
 def gate_activate():
-   t = ts()
    if request.json.get('mock'):
       msg = 'Mock Activate Request'
       print(msg)
       return msg
-   cstate,ct = REVERE.mget(["state","t"])
-   if t - float(ct) < 1:
-      msg = 'Not enough time between requests, ignoring'
-      print(msg)
-      return msg
-   task = __opposite_direction__(cstate)
-   if task:
-      REVERE.mset({"task":task,"t":ts()})
-   else:
-      return 'Error: Improper Target'
-   while cstate not in ['Opening','Closing']:
-      cstate = REVERE.get("state")
-      sleep(CADENCE)
-   return cstate
+   if ts() - last < 1:
+      return 'Activation Requested too early'
+   last = ts()
+   event('activate')
+   return REVERE.get("state")
 
 @app.route('/gate/status', methods=['post'])
 def gate_status():
@@ -55,12 +43,11 @@ def gate_ebrake():
       return f'ebrake: {ebrake}'
    elif request.method.lower() == 'post':
       if request.json.get('mock'):
-         msg = 'Mock Status Request'
+         msg = 'Mock ebrake Request'
          print(msg)
          return msg
-      new = {'ON':'OFF','OFF':'ON'}[ebrake]
-      REVERE.mset({'ebrake':new,'ebrake_eid':ts()})
-      return f'setting ebrake: {new}'
+      event('ebrake')
+      return f'toggling ebrake'
 
 
 if __name__ == '__main__':
