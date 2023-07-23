@@ -64,7 +64,7 @@ def action_triage(action):
          'activate': not ebrake_state and action == 'activate'
         ,'ebrake': action == 'ebrake'
     }.items() if v]
-    if len(triage) == 0:
+    if len(triage) == 1:
         return triage.pop()
     elif len(triage) > 1:
         Exception('Error: Conflicting Events')
