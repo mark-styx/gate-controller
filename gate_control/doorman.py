@@ -74,7 +74,10 @@ def action_triage(action):
 
 # Consume and evaluate stream
 def stream_handler():
-    events = REVERE.xread(streams={STREAM:0})[0][1]
+    events = REVERE.xread(streams={STREAM:0})
+    if not events:
+        return
+    events = events[0][1]
     keys = [k[0] for k in events]
     consumed = REVERE.lrange(CONSUMED,0,REVERE.llen(CONSUMED))
     new_events = [x for x in keys if x not in consumed]
