@@ -43,7 +43,7 @@ def eval_history(hist:dict)->dict:
     action = [k for k,v in action_space.items() if v]
     if action:
         action = action.pop()
-    if not any([x for x in hist['mock']]):
+    if not any([x for x in hist.values()['mock']]):
         event(action=action)
     else:
         print(f'mock {action}')

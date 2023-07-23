@@ -9,7 +9,6 @@ from time import sleep
 ts = lambda:dt.now().timestamp()
 
 app = Flask(__name__)
-last = 0
 
 '''
 keep list of ts's and then compare the last two to see if a partial 
@@ -22,9 +21,6 @@ def gate_activate():
       msg = 'Mock Activate Request'
       print(msg)
       return msg
-   if ts() - last < 1:
-      return 'Activation Requested too early'
-   last = ts()
    event('activate')
    return REVERE.get("state")
 
