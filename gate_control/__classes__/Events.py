@@ -11,14 +11,15 @@ class event:
           self
         , action:str
         , ttl:int=0
+        , MOCK=False
     ) -> None:
         self.t = dt.now().timestamp()
         self.tstr = str(dt.now())
         self.action = action
         self.ttl = ttl
-        self.__add_event()
+        self.__add_event(MOCK)
     
-    def __add_event(self):
+    def __add_event(self,MOCK):
         self.id = REVERE.xadd(
              name=STREAM
             ,maxlen=100
@@ -30,7 +31,7 @@ class event:
                 ,'tstr':self.tstr
             }
         )
-        self.await_claim()
+        if not MOCK:self.await_claim()
     
     
     def await_claim(self):

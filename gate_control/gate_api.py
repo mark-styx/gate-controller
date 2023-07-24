@@ -10,11 +10,6 @@ ts = lambda:dt.now().timestamp()
 
 app = Flask(__name__)
 
-'''
-keep list of ts's and then compare the last two to see if a partial 
-execution is required.
-'''
-
 @app.route('/gate/activate', methods=['post'])
 def gate_activate():
    if request.json.get('mock'):

@@ -12,9 +12,10 @@ class Relay:
         self.gpio = gpio
         GPIO.setup(self.gpio['ON'], GPIO.OUT)
         GPIO.setup(self.gpio['OFF'], GPIO.OUT)
+        self.state = 0
 
     def _reset(self):
-        print(f'relay {self.id} reset')
+        print(f'\trelay {self.id} reset')
         GPIO.output(self.gpio['OFF'], 0)
         GPIO.output(self.gpio['ON'], 0)
         sleep(PULSE_DELAY)
@@ -29,13 +30,15 @@ class Relay:
     def close(self):
         self._pulse('ON')
         self.t = dt.now().timestamp()
+        self.state = 1
 
     def open(self):
         self._pulse('OFF')
+        self.state = 0
 
-    def state(self):
+    def get_state(self):
         return {
              'relay':self.id
-            ,'state':GPIO.input(self.gpio['ON'])
+            ,'state':self.state
             ,'t':self.t
         }

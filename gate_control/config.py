@@ -11,7 +11,7 @@ SENSORS = {
         #,"UP":0
         #, "DN":0
     },
-    "PING":.8
+    "PING":.1
 }
 
 
