@@ -39,6 +39,7 @@ def ebrake():
         for relay in relays.values():
             interrupt(relay)
     else: ebrake_state = 0
+    return 0
 
 def activation_flow():
     active_relay =  get_active_relay()
@@ -84,7 +85,11 @@ def stream_handler():
     if new_events:
         event = new_events.pop()
         REVERE.rpush(CONSUMED,event)
-        action_wrapper(action_triage(events[event]['action']))()
+        todo = action_triage(events[event]['action'])
+        print('triaged',todo)
+        complete_time = action_wrapper(todo)()
+        return complete_time
+
 
 
 def get_relay_states()->list:
