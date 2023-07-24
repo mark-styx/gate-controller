@@ -131,7 +131,7 @@ class pigate:
             self.set_state()
             event = self.stream_event()
             if event and event['target'] != 'ebrake':
-                if event['completion_time'] >= self.ts():
+                if self.ts() >= event['completion_time']:
                     self.interrupt()
                     self.door_state = event['target']
             sleep(CADENCE)
