@@ -11,14 +11,14 @@ SENSORS = {
         #,"UP":0
         #, "DN":0
     },
-    "PING":.125
+    "PING":.1
 }
 
 
-DOOR_TRAVEL_TIME = 12.25
+STREAM='HELMS_DEEP'
+CONSUMED = 'HD_Handled'
+DOOR_TRAVEL_TIME = 12
 START_STATE = 'DN' # UP DN NA
-METHOD = 'TIME'
-HOST = '192.168.1.32:8000'
 CADENCE = .05
 
 PULSE = .5
