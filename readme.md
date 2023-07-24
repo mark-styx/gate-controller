@@ -1,6 +1,6 @@
 ## pi-gate
 
-A Raspberry Pi garage door controller.
+A Raspberry Pi garage door controller for my 50+ year old garage door.
 
 ### Services
 
