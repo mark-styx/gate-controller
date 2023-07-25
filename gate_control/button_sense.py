@@ -3,7 +3,6 @@
 # This means that the history eval should be modified to a list.
 # Which makes some of the filtering methods unnecessary.
 
-from gate_control import REVERE
 from gate_control.config import SENSORS
 from gate_control.__classes__.Sensor import Sense
 from gate_control.__classes__.Events import event
@@ -76,8 +75,8 @@ def eval_history(hist:dict)->dict:
     if action:
         if not any([x['mock'] for x in hist.values()]):
             event(action=action)
-    else:
-        print(f'mock {action}')
+        else:
+            print(f'mock {action}')
     return filter_history(hist,'last_30')
 
 
