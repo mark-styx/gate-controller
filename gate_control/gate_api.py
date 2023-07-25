@@ -19,7 +19,7 @@ def gate_activate():
    event('activate')
    return REVERE.get("state")
 
-@app.route('/gate/status', methods=['post'])
+@app.route('/gate/status', methods=['get'])
 def gate_status():
    if request.json.get('mock'):
       msg = 'Mock Status Request'
