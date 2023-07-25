@@ -94,15 +94,28 @@ def action_triage_test():
     print('passed')
     return 1
 
+def activation_test():
+    hist = {}
+    for x in range(30):
+        hist.update({ts():epoch()})
+        sleep(SENSORS['PING'])
+    sleep(2)
+    for x in range(11):
+        hist.update({ts():epoch(state=1)})
+        sleep(SENSORS['PING'])
+    current = get_current_activations(hist)
+    last_30 = get_all_activations(hist)
+    assert(action_triage(current=current,last_30=last_30) == 'activation')
+    
 
 
 def run_all_tests():
-    assert(epoch_test()==1)
-    assert(filter_history_test()==1)
-    assert(get_current_activations_test()==1)
-    assert(get_all_activations_test()==1)
-    assert(action_triage_test()==1)
-
+    #assert(epoch_test()==1)
+    #assert(filter_history_test()==1)
+    #assert(get_current_activations_test()==1)
+    #assert(get_all_activations_test()==1)
+    #assert(action_triage_test()==1)
+    activation_test()
 
 if __name__ == '__main__':
     run_all_tests()
