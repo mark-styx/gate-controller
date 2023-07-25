@@ -88,6 +88,7 @@ def button_control_flow(mock=False):
     hist = {}
     while True:
         if Button.get_state():
+            print('sensed')
             hist.update({ts():epoch(state=1,mock=mock)})
         else:
             hist.update({ts():epoch(state=0,mock=mock)})
