@@ -22,6 +22,7 @@ def epoch(
     return {
          'state':state
         ,'mock':mock
+        ,'triggered':False
     }
 
 def filter_history(hist:dict,method:str):
@@ -29,7 +30,7 @@ def filter_history(hist:dict,method:str):
     t = ts()
     return {
          'current':lambda:{k:v for k,v in hist.items() if (t-k) <= 1}
-        ,'previous':lambda:{k:v for k,v in hist.items() if (t-k) > 1}
+        ,'previous':lambda:{k for k,v in hist.items() if v['triggered'] and t-k <= 1}
         ,'last_30':lambda:{k:v for k,v in hist.items() if k in keys[-30:]}
     }[method]()
 
@@ -42,16 +43,16 @@ def get_current_activations(hist:dict):
 
 def get_prev_activations(hist:dict):
     previous = filter_history(hist,'previous')
-    return get_activations(previous)
+    return len(previous) > 1
 
 def get_all_activations(hist:dict):
     last_30 = filter_history(hist,'last_30')
     return get_activations(last_30)
 
-def action_triage(current:list,last_30:list):
+def action_triage(current:list,last_30:list,prev:bool):
     actions = {
           'ebrake':len(last_30) == 30
-        , 'activate':not(len(last_30) == 30) and current
+        , 'activate':not(len(last_30) == 30) and current and not prev
     }
     action_determination = [k for k,v in actions.items() if v]
     assert(len(action_determination) <= 1)
@@ -71,10 +72,12 @@ def eval_history(hist:dict)->dict:
     action = action_triage(
          current=get_current_activations(hist)
         ,last_30=get_all_activations(hist)
+        ,prev=get_prev_activations(hist)
     )
     if action:
         if not any([x['mock'] for x in hist.values()]):
             event(action=action)
+            hist[list(hist.keys())[-1]]['triggered']=True
         else:
             print(f'mock {action}')
     return filter_history(hist,'last_30')
