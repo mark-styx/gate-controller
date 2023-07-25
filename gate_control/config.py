@@ -7,7 +7,7 @@ RELAYS = {
 
 SENSORS = {
     "GPIO":{
-        "BT":21
+        "BT":11
         #,"UP":0
         #, "DN":0
     },
