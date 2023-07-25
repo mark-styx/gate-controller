@@ -21,10 +21,6 @@ def gate_activate():
 
 @app.route('/gate/status', methods=['get'])
 def gate_status():
-   if request.json.get('mock'):
-      msg = 'Mock Status Request'
-      print(msg)
-      return msg
    return REVERE.get("state")
 
 @app.route('/gate/ebrake', methods=['post','get'])
