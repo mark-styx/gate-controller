@@ -72,6 +72,7 @@ def eval_history(hist:dict)->dict:
          current=get_current_activations(hist)
         ,last_30=get_all_activations(hist)
     )
+    print(action)
     if action:
         if not any([x['mock'] for x in hist.values()]):
             event(action=action)

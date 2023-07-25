@@ -126,14 +126,18 @@ class pigate:
         })
 
     def control_flow(self):
+        self.event_completion = 0
+        self.event_target =  'DN'
         while True:
             self.get_door_motion()
             self.set_state()
             event = self.stream_event()
-            if event and event['target'] != 'ebrake':
-                if self.ts() >= event['completion_time']:
-                    self.interrupt()
-                    self.door_state = event['target']
+            if event:
+                self.event_target = event['target']
+                self.event_completion =  event['completion_time']
+            if self.event_completion and self.ts() >= self.event_completion:
+                self.interrupt()
+                self.door_state = self.event_target
             sleep(CADENCE)
 
 
