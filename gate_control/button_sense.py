@@ -51,7 +51,7 @@ def get_all_activations(hist:dict):
 def action_triage(current:list,last_30:list):
     actions = {
           'ebrake':len(last_30) == 30
-        , 'activation':not(len(last_30) == 30) and current
+        , 'activate':not(len(last_30) == 30) and current
     }
     action_determination = [k for k,v in actions.items() if v]
     assert(len(action_determination) <= 1)

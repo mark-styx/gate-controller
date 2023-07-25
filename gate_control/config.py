@@ -14,6 +14,7 @@ SENSORS = {
     "PING":.1
 }
 
+ACTIONS = ['ebrake','activate']
 
 STREAM='HELMS_DEEP'
 CONSUMED = 'HD_Handled'

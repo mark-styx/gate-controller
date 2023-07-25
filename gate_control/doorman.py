@@ -126,12 +126,14 @@ class pigate:
         })
 
     def control_flow(self):
+        event = None
         self.event_completion = 0
         self.event_target =  'DN'
         while True:
             self.get_door_motion()
             self.set_state()
-            event = self.stream_event()
+            try: event = self.stream_event()
+            except: pass
             if event:
                 self.event_target = event['target']
                 self.event_completion =  event['completion_time']

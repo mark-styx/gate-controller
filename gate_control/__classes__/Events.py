@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from gate_control.config import STREAM,CONSUMED
+from gate_control.config import STREAM,CONSUMED,ACTIONS
 from gate_control import REVERE
 
 import redis
@@ -19,6 +19,10 @@ class event:
         self.ttl = ttl
         self.__add_event(MOCK)
     
+    def action_checker(self):
+        if self.action not in ACTIONS:
+            raise('Invalid Action Received')
+
     def __add_event(self,MOCK):
         self.id = REVERE.xadd(
              name=STREAM
