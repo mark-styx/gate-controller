@@ -59,7 +59,7 @@ def action_triage(current:list,last_30:list,prev:bool):
     if action_determination:
         return action_determination.pop()
 
-def eval_history(hist:dict)->dict:
+def _eval_history(hist:dict)->dict:
     '''
     params:
         hist:dict - The dictionary containing the historical data for the button sense iterator.
@@ -83,19 +83,34 @@ def eval_history(hist:dict)->dict:
     return filter_history(hist,'last_30')
 
 
+def eval_history(hist:dict,last_activation,mock)->dict:
+    keys = sorted(list(hist.keys))[-30:]
+    hist = {k:v for k,v in hist.items() if k in keys}
+    ebrake = all([v['triggered'] == True for v in hist.values()])
+    if ebrake:
+        event('ebrake',MOCK=mock)
+    elif ts() - last_activation >= 1:
+        event('activate',MOCK=mock)
+    else:
+        pass
+    return hist
+
+
 def button_control_flow(mock=False):
     '''
     Check the state of the momentary switch at a defined cadence.
     If activated, sends message to the doorman and waits for feedback.
     '''
     hist = {}
+    last_activation = 0
     while True:
         if Button.get_state():
             print('sensed')
             hist.update({ts():epoch(state=1,mock=mock)})
+            hist = eval_history(hist,last_activation,mock)
+            last_activation = ts()
         else:
             hist.update({ts():epoch(state=0,mock=mock)})
-        hist = eval_history(hist)
         sleep(SENSORS['PING'])
 
 
