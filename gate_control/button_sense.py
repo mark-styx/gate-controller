@@ -84,7 +84,7 @@ def _eval_history(hist:dict)->dict:
 
 
 def eval_history(hist:dict,last_activation,mock)->dict:
-    keys = sorted(list(hist.keys))[-30:]
+    keys = sorted(list(hist.keys()))[-30:]
     hist = {k:v for k,v in hist.items() if k in keys}
     ebrake = all([v['triggered'] == True for v in hist.values()])
     if ebrake:
