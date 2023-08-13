@@ -115,7 +115,7 @@ def command_sequence(start):
     if (end - start) >= SWITCH_EBRAKE:
         return 'ebrake'
     else:
-        return 'activation'
+        return 'activate'
 
 
 def button_control_flow(mock=False):
