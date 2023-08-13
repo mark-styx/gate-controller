@@ -114,7 +114,7 @@ def button_control_flow(mock=False):
             last_activation = ts()
         else:
             hist.update({ts():epoch(state=0,mock=mock)})
-        hist = trunc_hist(hist)
+        hist = trunc_history(hist)
         sleep(SENSORS['PING'])
 
 
