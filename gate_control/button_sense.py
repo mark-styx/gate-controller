@@ -83,17 +83,20 @@ def _eval_history(hist:dict)->dict:
     return filter_history(hist,'last_30')
 
 
-def eval_history(hist:dict,last_activation,mock)->dict:
+def trunc_history(hist:dict)->dict:
     keys = sorted(list(hist.keys()))[-30:]
     hist = {k:v for k,v in hist.items() if k in keys}
-    ebrake = all([v['triggered'] == True for v in hist.values()])
+    return hist
+    
+    
+def eval_history(hist:dict,last_activation,mock)->dict:
+    ebrake = all([v['state'] == 1 for v in hist.values()])
     if ebrake:
         event('ebrake',MOCK=mock)
     elif ts() - last_activation >= 1:
         event('activate',MOCK=mock)
     else:
         pass
-    return hist
 
 
 def button_control_flow(mock=False):
@@ -107,10 +110,11 @@ def button_control_flow(mock=False):
         if Button.get_state():
             print('sensed')
             hist.update({ts():epoch(state=1,mock=mock)})
-            hist = eval_history(hist,last_activation,mock)
+            eval_history(hist,last_activation,mock)
             last_activation = ts()
         else:
             hist.update({ts():epoch(state=0,mock=mock)})
+        hist = trunc_hist(hist)
         sleep(SENSORS['PING'])
 
 
