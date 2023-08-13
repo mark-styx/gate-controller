@@ -3,7 +3,7 @@
 # This means that the history eval should be modified to a list.
 # Which makes some of the filtering methods unnecessary.
 
-from gate_control.config import SENSORS
+from gate_control.config import SENSORS,SWITCH_EBRAKE
 from gate_control.__classes__.Sensor import Sense
 from gate_control.__classes__.Events import event
 
@@ -98,8 +98,36 @@ def eval_history(hist:dict,last_activation,mock)->dict:
     else:
         pass
 
+# Instead of stream, consider batches of pulses
+# Pulase Batch -> Evaluate -> Send
+# Wait until command sequence has finished before sending
+# Ex. If two pulses return True, then keep listening for the third one
+# Pulse should return true if any of the checks return True during the pulse.
+
+# Maybe Just check how long it was held?
+
+
+
+def command_sequence(start):
+    while Button.get_state():
+        sleep(SENSORS['PING'])
+    end = ts()
+    if (end - start) >= SWITCH_EBRAKE:
+        return 'ebrake'
+    else:
+        return 'activation'
+
 
 def button_control_flow(mock=False):
+    while True:
+        if Button.get_state():
+            action = command_sequence(ts())
+            print(action)
+            event(action,MOCK=mock)
+        sleep(SENSORS['PING'])
+
+
+def _button_control_flow(mock=False):
     '''
     Check the state of the momentary switch at a defined cadence.
     If activated, sends message to the doorman and waits for feedback.
