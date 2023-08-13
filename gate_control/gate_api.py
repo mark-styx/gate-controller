@@ -17,7 +17,7 @@ def gate_activate():
       print(msg)
       return msg
    event('activate')
-   sleep(.5)
+   sleep(1.5)
    return REVERE.get("state")
 
 @app.route('/gate/status', methods=['get'])
