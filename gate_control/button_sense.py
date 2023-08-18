@@ -12,7 +12,7 @@ from time import sleep
 import argparse
 
 
-Button = Sense(gpio=SENSORS['GPIO']['BT'],id='momentary switch',active=1)
+Button = Sense(gpio=SENSORS['GPIO']['BT'],id='momentary switch',active=0)
 ts = lambda:dt.now().timestamp()
 
 def epoch(
