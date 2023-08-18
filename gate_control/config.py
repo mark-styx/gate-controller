@@ -1,6 +1,6 @@
 RELAYS = {
     "GPIO":{
-          "DN":{"ON":11,"OFF":12}
+          "DN":{"ON":18,"OFF":12}
         , "UP":{"ON":33,"OFF":37}
     }
 }
