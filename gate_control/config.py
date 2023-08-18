@@ -1,13 +1,13 @@
 RELAYS = {
     "GPIO":{
-          "UP":{"ON":22,"OFF":29}
-        , "DN":{"ON":36,"OFF":31}
+          "UP":{"ON":11,"OFF":12}
+        , "DN":{"ON":33,"OFF":37}
     }
 }
 
 SENSORS = {
     "GPIO":{
-        "BT":13
+        "BT":36
         #,"UP":0
         #, "DN":0
     },
