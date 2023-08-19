@@ -3,7 +3,7 @@ from gate_control.config import LOGS,LOG_STATE
 from datetime import datetime as dt
 from pathlib import Path
 
-def logger(func:function):
+def logger(func):
     def execute(*args,**kwargs):
         if LOG_STATE:
             log(func.__name__,str({
