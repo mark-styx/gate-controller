@@ -3,7 +3,7 @@ from pathlib import Path
 
 from gate_control.config import LOG_LEVEL
 
-folder = Path().home()
+folder = Path().home() / 'logs'
 
 def log(path,log_level,details):
     if LOG_LEVEL > log_level: return
