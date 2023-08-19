@@ -6,7 +6,7 @@
 from gate_control.config import SENSORS,SWITCH_EBRAKE
 from gate_control.__classes__.Sensor import Sense
 from gate_control.__classes__.Events import event
-from gate_control import GPIO,logger
+from gate_control import GPIO
 
 from datetime import datetime as dt
 from time import sleep
@@ -117,7 +117,6 @@ def command_sequence(start):
     else:
         return 'activate'
 
-@logger
 def button_control_flow(mock=False):
     while True:
         if Button.get_state():
