@@ -108,7 +108,6 @@ def eval_history(hist:dict,last_activation,mock)->dict:
 # Maybe Just check how long it was held?
 
 
-@logger
 def command_sequence(start):
     while Button.get_state():
         sleep(SENSORS['PING'])
