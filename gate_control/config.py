@@ -26,3 +26,5 @@ SWITCH_EBRAKE = 1.5
 
 PULSE = .5
 PULSE_DELAY = .25
+LOGS = '~/logs'
+LOG_STATE = 1
