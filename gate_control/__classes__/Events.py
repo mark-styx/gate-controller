@@ -1,6 +1,6 @@
 from datetime import datetime as dt
 from gate_control.config import STREAM,CONSUMED,ACTIONS
-from gate_control import REVERE,logger
+from gate_control import REVERE,log
 
 import redis
 
@@ -14,6 +14,15 @@ class event:
         , MOCK=False
         , source='undefined'
     ) -> None:
+        log(
+            'event',3
+            ,{
+                'note':'event created'
+                ,'tstr':str(dt.now())
+                ,'action':action
+                ,'source':source
+            }
+        )
         self.t = dt.now().timestamp()
         self.tstr = str(dt.now())
         self.action = action
@@ -21,13 +30,12 @@ class event:
         self.source = source
         self.__add_event(MOCK)
     
-    @logger
     def action_checker(self):
         if self.action not in ACTIONS:
             raise('Invalid Action Received')
     
-    @logger
     def __add_event(self,MOCK):
+        log('event',0,'add event entered')
         self.id = REVERE.xadd(
              name=STREAM
             ,maxlen=100
@@ -41,10 +49,12 @@ class event:
             }
         )
         if not MOCK:self.await_claim()
-    
-    @logger
+        log('event',0,'add event existed')
+
     def await_claim(self):
+        log('event',0,'await claim entered')
         while True:
             if self.id in REVERE.lrange(name=CONSUMED,start=-5,end=-1):
                 REVERE.ltrim(CONSUMED,-150,-1)
+                log('event',0,'await claim exited')
                 return

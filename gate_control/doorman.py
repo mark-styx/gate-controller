@@ -1,4 +1,4 @@
-from gate_control import REVERE,GPIO
+from gate_control import REVERE,GPIO,log
 from gate_control.__classes__.Switch import Relay
 from gate_control.config import RELAYS,DOOR_TRAVEL_TIME,CADENCE,STREAM,CONSUMED,PULSE
 
@@ -9,6 +9,7 @@ import argparse
 class pigate:
 
     def __init__(self,MOCK:bool=False) -> None:
+        log('pigate',3,'pigate instantiated')
         self.MOCK = MOCK
         self.UP = Relay(gpio=RELAYS["GPIO"]["UP"],id='UP')
         self.DN = Relay(gpio=RELAYS["GPIO"]["DN"],id='DN')
@@ -21,12 +22,14 @@ class pigate:
     # Handle Door Events
 
     def interrupt(self):
+        log('pigate',2,'door interrupted')
         for relay in self.relays.values():
             relay.open()
         return 'Interrupted'
 
 
     def activate(self,relay:Relay):
+        log('pigate',2,'door activated')
         if not self.ebrake_active:
             if not self.get_active_relay():
                 relay.close()
@@ -36,6 +39,7 @@ class pigate:
 
 
     def toggle_ebrake(self):
+        log('pigate',2,'toggling ebrake')
         if not self.ebrake_active:
             self.ebrake_active = 1
             for relay in self.relays.values():
@@ -45,6 +49,7 @@ class pigate:
 
 
     def activation_flow(self)->dict:
+        log('pigate',2,'started activation flow')
         active_relay = self.get_active_relay()
         direction = self.get_opposite_direction()
         if active_relay:
@@ -57,10 +62,12 @@ class pigate:
 
 
     def action_wrapper(self,action):
-        return {
+        A = {
             'activate':self.activation_flow
             , 'ebrake':self.toggle_ebrake
         }[action]
+        log('pigate',2,f'action wrapper resolved: {A}')
+        return A
 
 
     def action_triage(self,action):
@@ -69,17 +76,22 @@ class pigate:
             ,'ebrake': action == 'ebrake'
         }.items() if v]
         if len(triage) == 1:
-            return triage.pop()
+            A = triage.pop()
+            log('pigate',2,f'action triage resolved: {A}')
+            return A
         elif len(triage) > 1:
             Exception('Error: Conflicting Events')
         else:
+            log('pigate',2,f'action triage resolved no actions')
             return
 
 
     # Consume and evaluate stream
     def stream_event(self):
+        log('pigate',1,'checking event stream')
         events = REVERE.xread(streams={STREAM:0})
         if not events:
+            log('pigate',1,'no events in stream')
             return
         events = events[0][1]
         keys = [k[0] for k in events]
@@ -87,6 +99,7 @@ class pigate:
         new_events = [x for x in keys if x not in consumed]
         if new_events:
             event = new_events.pop()
+            log('pigate',1,f'stream returned: {event}')
             REVERE.rpush(CONSUMED,event)
             events = {x[0]:x[1] for x in events}
             print(events,event)
@@ -134,6 +147,7 @@ class pigate:
         })
 
     def control_flow(self):
+        log('pigate',3,'starting control flow')
         event = None
         self.event_completion = 0
         self.event_target =  'DN'
@@ -145,6 +159,7 @@ class pigate:
             if event:
                 self.event_target = event['target']
                 self.event_completion =  event['completion_time']
+                log('pigate',3,f'handling event:{self.event_target} until:{self.event_completion}')
             if self.event_completion and self.ts() >= self.event_completion:
                 self.interrupt()
                 self.door_state = self.event_target
