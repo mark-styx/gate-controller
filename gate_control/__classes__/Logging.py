@@ -16,8 +16,8 @@ def logger(func):
     return execute
 
 def log(path,details):
-    folder = Path(LOGS)
+    folder = Path.home() / LOGs
     if not folder.exists():
         folder.mkdir()
-    with open(Path(f'{LOGS}/{path}.txt'),'a') as f:
+    with open(folder/f'{path}.txt'),'a') as f:
         f.write(details)
