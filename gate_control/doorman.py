@@ -77,7 +77,6 @@ class pigate:
 
 
     # Consume and evaluate stream
-    @logger
     def stream_event(self):
         events = REVERE.xread(streams={STREAM:0})
         if not events:
@@ -114,7 +113,6 @@ class pigate:
             ,'Opening':'DN'
         }[self.door_state]
 
-    @logger
     def get_door_motion(self):
         if self.UP.state:
             self.door_state = 'Opening'
@@ -128,7 +126,6 @@ class pigate:
             return DOOR_TRAVEL_TIME
         else: return t
 
-    @logger
     def set_state(self,):
         REVERE.mset({
             't':dt.now().timestamp()
