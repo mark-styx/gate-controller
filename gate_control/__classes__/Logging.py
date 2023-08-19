@@ -10,4 +10,4 @@ def log(path,log_level,details):
     if not folder.exists():
         folder.mkdir()
     with open(folder/f'{path}.txt','a') as f:
-        f.write(details + '\n')
+        f.write(str(details) + '\n')
