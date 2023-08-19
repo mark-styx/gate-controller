@@ -1,5 +1,4 @@
 from gate_control import REVERE
-from gate_control.config import DOOR_TRAVEL_TIME
 from gate_control.__classes__.Events import event
 
 from flask import Flask,request
@@ -16,7 +15,7 @@ def gate_activate():
       msg = 'Mock Activate Request'
       print(msg)
       return msg
-   event('activate')
+   event('activate',source='api')
    sleep(1.5)
    return REVERE.get("state")
 
@@ -34,7 +33,7 @@ def gate_ebrake():
          msg = 'Mock ebrake Request'
          print(msg)
          return msg
-      event('ebrake')
+      event('ebrake',source='api')
       return f'toggling ebrake'
 
 

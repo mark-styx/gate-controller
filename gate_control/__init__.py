@@ -7,3 +7,5 @@ except:
 
 import redis
 REVERE = redis.Redis(decode_responses=True)
+
+from gate_control.__classes__.Logging import logger

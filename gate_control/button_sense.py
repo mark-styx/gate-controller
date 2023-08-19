@@ -6,6 +6,7 @@
 from gate_control.config import SENSORS,SWITCH_EBRAKE
 from gate_control.__classes__.Sensor import Sense
 from gate_control.__classes__.Events import event
+from gate_control import GPIO,logger
 
 from datetime import datetime as dt
 from time import sleep
@@ -107,7 +108,7 @@ def eval_history(hist:dict,last_activation,mock)->dict:
 # Maybe Just check how long it was held?
 
 
-
+@logger
 def command_sequence(start):
     while Button.get_state():
         sleep(SENSORS['PING'])
@@ -117,13 +118,13 @@ def command_sequence(start):
     else:
         return 'activate'
 
-
+@logger
 def button_control_flow(mock=False):
     while True:
         if Button.get_state():
             action = command_sequence(ts())
             print(action)
-            event(action,MOCK=mock)
+            event(action,source='button',MOCK=mock)
         sleep(SENSORS['PING'])
 
 
@@ -150,4 +151,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mock", type=int, help = "Mock Status")
     args = parser.parse_args()
-    button_control_flow(mock=args.mock)
+    try:
+        button_control_flow(mock=args.mock)
+    finally:
+        GPIO.cleanup()

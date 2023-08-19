@@ -1,6 +1,6 @@
-from gate_control import REVERE
+from gate_control import REVERE,GPIO,logger
 from gate_control.__classes__.Switch import Relay
-from gate_control.config import RELAYS,DOOR_TRAVEL_TIME,CADENCE,STREAM,CONSUMED
+from gate_control.config import RELAYS,DOOR_TRAVEL_TIME,CADENCE,STREAM,CONSUMED,PULSE
 
 from datetime import datetime as dt
 from time import sleep
@@ -19,11 +19,13 @@ class pigate:
         self.ts = lambda:dt.now().timestamp()
 
     # Handle Door Events
+    @logger
     def interrupt(self):
         for relay in self.relays.values():
             relay.open()
         return 'Interrupted'
 
+    @logger
     def activate(self,relay:Relay):
         if not self.ebrake_active:
             if not self.get_active_relay():
@@ -32,6 +34,7 @@ class pigate:
         else:
             return 'Ebrake is Active, No Actions May Be Taken'
 
+    @logger
     def toggle_ebrake(self):
         if not self.ebrake_active:
             self.ebrake_active = 1
@@ -40,6 +43,7 @@ class pigate:
         else: self.ebrake_active = 0
         return {'completion_time':0,'target':'ebrake'}
 
+    @logger
     def activation_flow(self)->dict:
         active_relay = self.get_active_relay()
         direction = self.get_opposite_direction()
@@ -51,13 +55,14 @@ class pigate:
         self.activate(self.relays[direction])
         return {'completion_time':travel + self.ts(),'target':direction}
 
-
+    @logger
     def action_wrapper(self,action):
         return {
             'activate':self.activation_flow
             , 'ebrake':self.toggle_ebrake
         }[action]
 
+    @logger
     def action_triage(self,action):
         triage = [k for k,v in {
             'activate': not self.ebrake_active and action == 'activate'
@@ -72,6 +77,7 @@ class pigate:
 
 
     # Consume and evaluate stream
+    @logger
     def stream_event(self):
         events = REVERE.xread(streams={STREAM:0})
         if not events:
@@ -88,15 +94,18 @@ class pigate:
             todo = self.action_triage(events[event]['action'])
             return self.action_wrapper(todo)()
 
+    @logger
     def get_relay_states(self)->list:
         return [relay.get_state() for relay in self.relays]
 
+    @logger
     def get_active_relay(self)->Relay:
         if self.UP.state:
             return self.UP
         elif self.DN.state:
             return self.DN
 
+    @logger
     def get_opposite_direction(self)->str:
         return {
              'DN':'UP'
@@ -105,19 +114,21 @@ class pigate:
             ,'Opening':'DN'
         }[self.door_state]
 
+    @logger
     def get_door_motion(self):
         if self.UP.state:
             self.door_state = 'Opening'
         elif self.DN.state:
             self.door_state = 'Closing'
         
-
+    @logger
     def travel_time(self,start:float):
-        t = self.ts()-start
+        t = self.ts()-start-PULSE
         if t>DOOR_TRAVEL_TIME:
             return DOOR_TRAVEL_TIME
         else: return t
 
+    @logger
     def set_state(self,):
         REVERE.mset({
             't':dt.now().timestamp()
@@ -125,6 +136,7 @@ class pigate:
             ,'ebrake':self.ebrake_active
         })
 
+    @logger
     def control_flow(self):
         event = None
         self.event_completion = 0
@@ -149,4 +161,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     MOCK=args.MOCK
     gate = pigate(MOCK=MOCK)
-    gate.control_flow()
+    try:
+        gate.control_flow()
+    finally:
+        GPIO.cleanup()
