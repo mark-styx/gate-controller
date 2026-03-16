@@ -28,3 +28,7 @@ SWITCH_THRESHOLD = .25
 PULSE = .5
 PULSE_DELAY = .25
 LOG_LEVEL = 0
+
+# API Security
+# Generate a secure random key: python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+API_KEY = 'your-secret-api-key-here-change-this'

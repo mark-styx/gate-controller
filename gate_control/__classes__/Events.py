@@ -32,7 +32,7 @@ class event:
     
     def action_checker(self):
         if self.action not in ACTIONS:
-            raise('Invalid Action Received')
+            raise ValueError(f'Invalid Action Received: {self.action}. Valid actions: {ACTIONS}')
     
     def __add_event(self,MOCK):
         log('event',0,'add event entered')

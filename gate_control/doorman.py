@@ -89,10 +89,15 @@ class pigate:
     # Consume and evaluate stream
     def stream_event(self):
         log('pigate',1,'checking event stream')
-        events = REVERE.xread(streams={STREAM:0})
+        try:
+            events = REVERE.xread(streams={STREAM:0})
+        except Exception as e:
+            log('pigate',0,f'Redis error reading stream: {e}')
+            return None
+            
         if not events:
             log('pigate',1,'no events in stream')
-            return
+            return None
         events = events[0][1]
         keys = [k[0] for k in events]
         consumed = REVERE.lrange(CONSUMED,0,REVERE.llen(CONSUMED))
@@ -104,7 +109,9 @@ class pigate:
             events = {x[0]:x[1] for x in events}
             print(events,event)
             todo = self.action_triage(events[event]['action'])
-            return self.action_wrapper(todo)()
+            if todo:
+                return self.action_wrapper(todo)()
+        return None
 
 
     def get_relay_states(self)->list:
@@ -153,9 +160,17 @@ class pigate:
         self.event_target =  'DN'
         while True:
             self.get_door_motion()
-            self.set_state()
-            try: event = self.stream_event()
-            except: pass
+            try:
+                self.set_state()
+            except Exception as e:
+                log('pigate',0,f'Error setting state in Redis: {e}')
+            
+            try:
+                event = self.stream_event()
+            except Exception as e:
+                log('pigate',0,f'Error processing stream event: {e}')
+                event = None
+                
             if event:
                 self.event_target = event['target']
                 self.event_completion =  event['completion_time']
